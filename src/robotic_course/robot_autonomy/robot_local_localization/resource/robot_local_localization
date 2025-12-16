@@ -1,0 +1,10 @@
+# config/params.yaml
+
+# فاصله بین چرخ‌ها (متر)
+wheel_separation: 0.46  
+
+# شعاع چرخ‌ها (متر)
+wheel_radius: 0.1        
+
+# نام تاپیک فرمان‌ها
+cmd_vel_topic: '/cmd_vel' 
