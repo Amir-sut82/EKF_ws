@@ -4,7 +4,7 @@
   <name>robot_local_localization</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="ahmadinejad.sut@gmail.com">narjes</maintainer>
+  <maintainer email="ahmadinejad.sut@gmail.com">Amirhossein</maintainer>
   <license>TODO: License declaration</license>
 
   <test_depend>ament_copyright</test_depend>
