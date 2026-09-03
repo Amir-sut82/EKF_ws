@@ -6,7 +6,7 @@ package_name = 'robot_local_localization'
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='0.1.0',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -26,8 +26,8 @@ setup(
     zip_safe=True,
     maintainer='Amir',
     maintainer_email='ahmainejad.sut@gmail.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='Extended Kalman filter localization for a differential-drive robot using commanded motion, visual odometry, and IMU orientation.',
+    license='Apache-2.0',
     extras_require={
         'test': [
             'pytest',
@@ -36,7 +36,6 @@ setup(
     entry_points={
         'console_scripts': [
             'frame_id_converter_node = robot_local_localization.frame_id_converter:main',
-            'ekf_diff_imu_node = robot_local_localization.ekf_diff_imu:main',
             'ekf_node = robot_local_localization.ekf_node:main',
             'test_node = robot_local_localization.test_node:main',
             'prediction_node = robot_local_localization.prediction_node:main',
@@ -44,3 +43,4 @@ setup(
         ],
     },
 )
+
