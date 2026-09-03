@@ -83,6 +83,53 @@ ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/Twist \
 
 Inspect `/prediction/odom`, `/measurement/odom`, and `/ekf/odom` with `ros2 topic echo`.
 
+## Keyboard driving and path plotting
+
+Install the standard keyboard teleoperation package once:
+
+```bash
+sudo apt install ros-<ros_distro>-teleop-twist-keyboard
+```
+
+Use three terminals. Source ROS and the workspace in each terminal.
+
+Terminal 1 — start Gazebo, the bridge, visual odometry, prediction, measurement, and EKF:
+
+```bash
+ros2 launch robot_local_localization gazebo.launch.py
+```
+
+Terminal 2 — start the rectangle test and path recorder:
+
+```bash
+ros2 run robot_local_localization test_node
+```
+
+`test_node` publishes `/ekf_path`, `/measurement_path`, `/prediction_path`, and `/gt_path`. It also contains an optional automatic rectangle command sequence. When it is stopped with `Ctrl-C`, it plots the collected EKF, measurement, prediction, and ground-truth paths with Matplotlib.
+
+Terminal 3 — drive manually with the keyboard:
+
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+
+The keyboard node publishes `/cmd_vel`. Press `u`, `i`, `o`, `j`, `k`, `l`, `m`, `,`, and `.` for motion, and `k` or the teleop stop key for zero velocity. If using the automatic rectangle test, do not run a second publisher to `/cmd_vel` at the same time.
+
+The current launch file already starts `ros_gz_bridge` using `config/gz_bridge.yaml`; a separate bridge command is normally unnecessary. To inspect the ground-truth bridge directly:
+
+```bash
+ros2 topic echo /world/depot/dynamic_pose/info
+```
+
+For a manual bridge in an older setup, the equivalent direction is Gazebo to ROS:
+
+```bash
+ros2 run ros_gz_bridge parameter_bridge \
+  '/world/depot/dynamic_pose/info@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V'
+```
+
+The configuration-file approach is preferred because it starts all required bridge mappings together.
+
 ## Important topics
 
 | Topic | Purpose |
