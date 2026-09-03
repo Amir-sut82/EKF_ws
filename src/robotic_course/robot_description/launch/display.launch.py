@@ -12,31 +12,30 @@ def generate_launch_description():
     default_rviz_config_path = os.path.join(pkg_share, 'rviz', 'config.rviz')
 
 
-    with open(default_model_path, 'r') as infp:
-        robot_desc = infp.read()
-        
-        
+    model_path = LaunchConfiguration('model')
+    robot_desc = Command(['cat ', model_path])
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
         name='robot_state_publisher',
         output = 'screen',
         parameters=[
-        {'use_time_sim': True},
-        {'robot_description': robot_desc}
-    	])
+            {'use_sim_time': False},
+            {'robot_description': robot_desc}
+        ])
     	
     joint_state_publisher_node = Node(
         package='joint_state_publisher',
         executable='joint_state_publisher',
         name='joint_state_publisher',
-        parameters=[{'robot_description': Command(['xacro ', default_model_path])}],
+        parameters=[{'robot_description': robot_desc}],
         condition=UnlessCondition(LaunchConfiguration('gui'))
     )
     joint_state_publisher_gui_node = Node(
         package='joint_state_publisher_gui',
         executable='joint_state_publisher_gui',
         name='joint_state_publisher_gui',
+        parameters=[{'robot_description': robot_desc}],
         condition=IfCondition(LaunchConfiguration('gui'))
     )
     rviz_node = Node(
@@ -56,3 +55,4 @@ def generate_launch_description():
         robot_state_publisher_node,
         rviz_node, 
     ])
+
