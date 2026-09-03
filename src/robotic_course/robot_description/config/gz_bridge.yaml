@@ -40,6 +40,13 @@
   gz_type_name: "gz.msgs.Pose_V"
   direction: GZ_TO_ROS
 
+# Gazebo ground-truth poses used by test_node for path comparison
+- ros_topic_name: "/world/depot/dynamic_pose/info"
+  gz_topic_name: "/world/depot/dynamic_pose/info"
+  ros_type_name: "tf2_msgs/msg/TFMessage"
+  gz_type_name: "gz.msgs.Pose_V"
+  direction: GZ_TO_ROS
+
 # IMU sensor
 - ros_topic_name: "/zed/zed_node/imu/data_raw"
   gz_topic_name: "/zed/zed_node/imu/data_raw"
@@ -94,3 +101,4 @@
   ros_type_name: "sensor_msgs/msg/Image"
   gz_type_name: "gz.msgs.Image"
   direction: GZ_TO_ROS
+
