@@ -19,6 +19,12 @@ class EkfNode(Node):
         self.declare_parameter('odom_frame_id', 'odom')
         self.declare_parameter('base_frame_id', 'base_link')
         self.declare_parameter('time_step', 0.1)
+        self.declare_parameter('process_noise_x', 2.0e-3)
+        self.declare_parameter('process_noise_y', 2.0e-3)
+        self.declare_parameter('process_noise_yaw', 1.2e-2)
+        self.declare_parameter('measurement_noise_x', 4.0e-4)
+        self.declare_parameter('measurement_noise_y', 4.0e-4)
+        self.declare_parameter('measurement_noise_yaw', 7.0e-4)
 
         # read parameters
         self.odom_frame = self.get_parameter('odom_frame_id').value
@@ -30,8 +36,17 @@ class EkfNode(Node):
         self.create_subscription(Odometry, '/measurement/odom', self.measurement_callback, 10)
 
         # EKF parameters
-        self.R = np.diag([2.0e-3, 2.0e-3, 1.2e-2])  # process (yaw بزرگ‌تر)
-        self.Q = np.diag([4.0e-4, 4.0e-4, 7.0e-4])  # measurement
+        # R is process noise and Q is measurement noise. Both are variances.
+        self.R = np.diag([
+            self.get_parameter('process_noise_x').value,
+            self.get_parameter('process_noise_y').value,
+            self.get_parameter('process_noise_yaw').value,
+        ])
+        self.Q = np.diag([
+            self.get_parameter('measurement_noise_x').value,
+            self.get_parameter('measurement_noise_y').value,
+            self.get_parameter('measurement_noise_yaw').value,
+        ])
 
         self.mu = np.zeros((3, 1))
         self.Sigma = np.eye(3) * 1.0
@@ -39,6 +54,7 @@ class EkfNode(Node):
         self.wz = 0.0
         self.est_x = 0.0
         self.est_y = 0.0
+        self.measurement_received = False
 
         
         self.est = Quaternion()
@@ -68,6 +84,7 @@ class EkfNode(Node):
         self.est_x = msg.pose.pose.position.x
         self.est_y = msg.pose.pose.position.y
         self.est = msg.pose.pose.orientation  
+        self.measurement_received = True
 
     def step(self):
 
@@ -92,7 +109,12 @@ class EkfNode(Node):
         # covariance prediction
         self.Sigma = G @ self.Sigma @ G.T + self.R
 
-        # Measurement step
+        # Measurement step. Do not update from the zero-valued placeholder
+        # before the first visual/IMU measurement arrives.
+        if not self.measurement_received:
+            self.publish()
+            return
+
         z = np.zeros((3, 1))
 
      
@@ -118,8 +140,11 @@ class EkfNode(Node):
         self.mu = self.mu + K @ innovation
         self.mu[2, 0] = math.atan2(math.sin(self.mu[2, 0]), math.cos(self.mu[2, 0]))
 
-        # covariance update
-        self.Sigma = (np.eye(3) - K @ H) @ self.Sigma
+        # Joseph-form covariance update preserves symmetry and positive
+        # semidefiniteness better than (I - KH) Sigma in finite precision.
+        I = np.eye(3)
+        self.Sigma = (I - K @ H) @ self.Sigma @ (I - K @ H).T + K @ self.Q @ K.T
+        self.Sigma = 0.5 * (self.Sigma + self.Sigma.T)
 
 
 
@@ -176,3 +201,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
