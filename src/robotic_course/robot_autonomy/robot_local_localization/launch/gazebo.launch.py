@@ -177,7 +177,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         DeclareLaunchArgument('use_sim_time',default_value='True',description='Use sim time if true'),
-        DeclareLaunchArgument('urdf_file',default_value=os.path.join(bringup_dir, 'src', 'description', 'test.urdf'),description='Whether to start RVIZ'),
+        DeclareLaunchArgument('urdf_file',default_value=urdf_file,description='Absolute path to the robot URDF'),
         DeclareLaunchArgument('use_robot_state_pub',default_value='True',description='Whether to start the robot state publisher'),
         gz_resource_path,
         gz_sim,bridge,
@@ -194,3 +194,4 @@ def generate_launch_description():
      
         ]
     )
+
