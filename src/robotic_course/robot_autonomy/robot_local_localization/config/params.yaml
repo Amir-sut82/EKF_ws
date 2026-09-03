@@ -25,10 +25,17 @@ ekf_node:
   ros__parameters:
     odom_frame_id: "odom"
     base_frame_id: "base_link"    
-    time_step: 0.1         
+    time_step: 0.1
+    process_noise_x: 0.002
+    process_noise_y: 0.002
+    process_noise_yaw: 0.012
+    measurement_noise_x: 0.0004
+    measurement_noise_y: 0.0004
+    measurement_noise_yaw: 0.0007
 
 # Parameters for test
 test_node:
   ros__parameters:
     odom_frame_id: "odom"
-    time_step: 0.1    
+    time_step: 0.1
+
